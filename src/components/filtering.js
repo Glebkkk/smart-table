@@ -19,19 +19,21 @@ export function initFiltering(elements, indexes) {
     return (data, state, action) => {
         // @todo: #4.2 — обработать очистку поля
         if (action && action.name === 'clear') {
-        const field = action.dataset.field;
+    const field = action.dataset.field;
 
-        const parent = action.closest('label');
+    const parent = action.closest('label');
+
+    if (parent) {
         const input = parent.querySelector('input');
-
         if (input) {
             input.value = '';
         }
+    }
 
-        if (state[field] !== undefined) {
-            state[field] = '';
-        }
-        }
+    if (state[field] !== undefined) {
+        state[field] = '';
+    }
+}
 
         // @todo: #4.5 — отфильтровать данные используя компаратор
         return data.filter(row => compare(row, state));

@@ -12,15 +12,15 @@ export function initTable(settings, onAction) {
     const root = cloneTemplate(tableTemplate);
 
     // @todo: #1.2 —  вывести дополнительные шаблоны до и после таблицы
-    [...before].reverse().forEach(subName => {
+    before.forEach(subName => {
     root[subName] = cloneTemplate(subName);
-    root.container.prepend(root[subName].container);
+    root.elements.rows.before(root[subName].container);
 });
 
-    after.forEach(subNsme => {
-        root[subName] = cloneTemplate(subNsme);
-        root.container.appendChild(root[subNsme].container);
-    });
+    after.forEach(subName => {
+    root[subName] = cloneTemplate(subName);
+    root.container.appendChild(root[subName].container);
+});
 
     // @todo: #1.3 —  обработать события и вызвать onAction()
     root.container.addEventListener('change', () => {
