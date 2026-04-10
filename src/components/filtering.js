@@ -1,54 +1,56 @@
-import {createComparison, defaultRules} from "../lib/compare.js";
+export function initFiltering(elements) {
 
-// @todo: #4.3 — настроить компаратор
-const compare = createComparison(defaultRules);
+    const updateIndexes = (elements, indexes) => {
+        Object.keys(indexes).forEach((elementName) => {
+            elements[elementName].append(
+                ...Object.values(indexes[elementName]).map(name => {
+                    const el = document.createElement('option');
+                    el.textContent = name;
+                    el.value = name;
+                    return el;
+                })
+            )
+        })
+    }
 
-export function initFiltering(elements, indexes) {
-    // @todo: #4.1 — заполнить выпадающие списки опциями
-    Object.keys(indexes).forEach((elementName) => {
-        elements[elementName].append(
-            ...Object.values(indexes[elementName]).map(value => {
-                const option = document.createElement('option');
-                option.value = value;
-                option.textContent = value;
-                return option;
-            })
-        );
-    });
-
-    return (data, state, action) => {
-        // @todo: #4.2 — обработать очистку поля
+    const applyFiltering = (query, state, action) => {
         if (action && action.name === 'clear') {
-    const field = action.dataset.field;
+            const field = action.dataset.field;
+            const parent = action.closest('label');
 
-    const parent = action.closest('label');
+            if (parent) {
+                const input = parent.querySelector('input');
+                if (input) input.value = '';
+            }
 
-    if (parent) {
-        const input = parent.querySelector('input');
-        if (input) {
-            input.value = '';
+            if (state[field] !== undefined) {
+                state[field] = '';
+            }
         }
+
+        const filter = {};
+        Object.keys(elements).forEach(key => {
+            if (elements[key]) {
+                if (
+                    ['INPUT', 'SELECT'].includes(elements[key].tagName) &&
+                    elements[key].value
+                ) {
+                    filter[`filter[${elements[key].name}]`] = elements[key].value;
+                }
+            }
+        });
+
+        return Object.keys(filter).length
+            ? { ...query, ...filter }
+            : query;
     }
 
-    if (state[field] !== undefined) {
-        state[field] = '';
+    return {
+        updateIndexes,
+        applyFiltering
     }
 }
 
-        // @todo: #4.5 — отфильтровать данные используя компаратор
-       const totalFrom = parseFloat(state.totalFrom);
-const totalTo = parseFloat(state.totalTo);
+    
 
-return data.filter(row => {
-    if (!isNaN(totalFrom) && row.total < totalFrom) {
-        return false;
-    }
-
-    if (!isNaN(totalTo) && row.total > totalTo) {
-        return false;
-    }
-
-    return compare(row, state);
-});
-    }
-}
+    
